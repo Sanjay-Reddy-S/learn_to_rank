@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.cross_validation import train_test_split
 from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LogisticRegression
+from sklearn import tree
 import pdb
 from sklearn.metrics import *
 import matplotlib.pyplot as plt
@@ -273,11 +274,17 @@ def train_model(model, prediction_function, X_train, y_train, X_test, y_test):
     
     return model
 
-def get_predicted_outcome(model, data):
+def get_predicted_outcome_1(model, data):
     return np.argmax(model.predict_proba(data), axis=1).astype(np.float32)
 
-def get_predicted_rank(model, data):
+def get_predicted_rank_1(model, data):
     return model.predict_proba(data)[:, 1]
+
+def get_predicted_outcome_2(model, data):
+    return np.rint(model.predict(data))
+
+def get_predicted_rank_2(model, data):
+    return model.predict(data)
 
 class PerfectPredictor:
     def fit(self, X, y):
@@ -295,5 +302,8 @@ feature_cols = get_fet_cols(train_data)
 plot_events_distribution(events_data)
 
 X_train, X_test, y_train, y_test = get_test_train_data(events_data, feature_cols)
-model = train_model(LogisticRegression(), get_predicted_outcome, X_train, y_train, X_test, y_test)
-plot_rank(['price'], model, train_data, get_predicted_rank,title="Prediction of rank vs price...")
+model = train_model(LogisticRegression(), get_predicted_outcome_1, X_train, y_train, X_test, y_test)
+plot_rank(['price'], model, train_data, get_predicted_rank_1,title="Prediction of rank vs price...")
+print
+model = train_model(tree.DecisionTreeClassifier(),get_predicted_outcome_1, X_train, y_train, X_test, y_test)
+plot_rank(['price'], model, train_data, get_predicted_rank_1,title="Prediction of rank vs price...")
